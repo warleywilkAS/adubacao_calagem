@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IDR-Paraná – Recomendação de Adubagem e Calagem para Soja</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<title>IDR-Paraná – Recomendação de Adubagem e Calagem para Soja</title>
 <style>
 /* ===== RESET & VARIÁVEIS ===== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --verde:        #1E4D2B;
+  --verde:        #1E4D2B; 
   --verde-medio:  #2E6B3E;
   --verde-claro:  #4A8C5C;
   --verde-fundo:  #EAF3DE;
@@ -87,11 +87,11 @@ header {
 
 /* ===== MAIN GRID ===== */
 main {
-  max-width: 1380px;
+  max-width: 1800px;
   margin: 2rem auto;
   padding: 0 1.5rem;
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr 0.9fr;
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
   align-items: start;
 }
@@ -223,6 +223,44 @@ main {
   font-size: 12px; color: #2E7D32; align-items: center; gap: 7px;
 }
 .proc-msg.on { display: flex; }
+
+.proc-loading {
+  display: none; margin-top: 8px;
+  background: #E3F2FD; border: 1px solid #90CAF9;
+  border-radius: var(--r-sm); padding: 9px 12px;
+  font-size: 12px; color: #1565C0; align-items: center; gap: 9px;
+}
+.proc-loading.on { display: flex; }
+.spinner {
+  width: 14px; height: 14px; flex: 0 0 auto;
+  border: 2.5px solid #90CAF9; border-top-color: #1565C0;
+  border-radius: 50%; animation: girar 0.8s linear infinite;
+}
+@keyframes girar { to { transform: rotate(360deg); } }
+
+.proc-erro {
+  display: none; margin-top: 8px;
+  background: #FDECEA; border: 1px solid #F5A9A2;
+  border-radius: var(--r-sm); padding: 9px 12px;
+  font-size: 12px; color: #C0392B; align-items: flex-start; gap: 7px;
+}
+.proc-erro.on { display: flex; }
+
+.extracao-resumo {
+  display: none; margin-top: 10px;
+  background: var(--cinza-leve); border: 1px solid var(--borda);
+  border-radius: var(--r-sm); padding: 10px 12px; font-size: 11.5px;
+}
+.extracao-resumo.on { display: block; }
+.extracao-resumo .titulo { font-weight: 700; margin-bottom: 6px; color: var(--texto); }
+.extracao-resumo .ok-tag { color: #2E7D32; }
+.extracao-resumo .falta-tag { color: #C0392B; }
+
+.campo-auto {
+  background: #E8F5E9 !important;
+  border-color: #81C784 !important;
+  transition: background 1.5s ease, border-color 1.5s ease;
+}
 
 /* ===== TEXTAREA ===== */
 #obs {
@@ -396,6 +434,118 @@ footer {
 footer strong { color: white; }
 footer a { color: rgba(255,255,255,0.7); }
 
+/* Botão Gerenciar Culturas (header) */
+.btn-culturas {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--verde-medio); color: white; border: none;
+  border-radius: var(--r-sm); padding: 8px 14px;
+  font-size: 12.5px; font-weight: 600; cursor: pointer;
+  white-space: nowrap;
+}
+.btn-culturas:hover { background: var(--verde); }
+
+/* ===== MODAL: GERENCIAR CULTURAS ===== */
+.modal-ov-lg {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.55); z-index: 300;
+  align-items: flex-start; justify-content: center;
+  padding: 2.5vh 1rem; overflow-y: auto;
+}
+.modal-ov-lg.on { display: flex; }
+.modal-lg {
+  background: var(--branco); border-radius: var(--r);
+  max-width: 920px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  margin-bottom: 2.5vh;
+}
+.modal-lg-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.1rem 1.4rem; border-bottom: 1px solid var(--borda);
+  position: sticky; top: 0; background: var(--branco); border-radius: var(--r) var(--r) 0 0; z-index: 2;
+}
+.modal-lg-hdr h3 { font-size: 16px; font-weight: 700; display:flex; align-items:center; gap:8px; }
+.modal-lg-close { background: none; border: none; font-size: 20px; color: var(--cinza); cursor: pointer; padding: 4px 8px; }
+.modal-lg-close:hover { color: var(--texto); }
+.modal-lg-body { padding: 1.4rem; }
+
+/* Lista de culturas */
+.lista-culturas { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+.item-cultura {
+  display: flex; align-items: center; gap: 10px;
+  border: 1px solid var(--borda); border-radius: var(--r-sm);
+  padding: 10px 12px; background: var(--cinza-leve);
+}
+.item-cultura .nome-cult { font-weight: 700; font-size: 13.5px; flex: 1; }
+.item-cultura .tag-sistema {
+  font-size: 10px; font-weight: 700; color: var(--verde-medio);
+  background: #E8F5E9; border-radius: 20px; padding: 2px 9px;
+}
+.item-cultura .tag-custom {
+  font-size: 10px; font-weight: 700; color: #1565C0;
+  background: #E3F2FD; border-radius: 20px; padding: 2px 9px;
+}
+.item-cultura .acoes-cult { display: flex; gap: 6px; }
+.item-cultura button {
+  border: none; background: var(--branco); border: 1px solid var(--borda);
+  border-radius: 6px; padding: 6px 9px; font-size: 12px; cursor: pointer; color: var(--texto-sec);
+}
+.item-cultura button:hover { background: var(--cinza-leve); color: var(--texto); }
+.item-cultura button.btn-excluir:hover { color: #C0392B; border-color: #F5A9A2; }
+
+.barra-topo-culturas { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap; }
+.barra-topo-culturas .grupo { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.btn-primario {
+  background: var(--verde); color: white; border: none; border-radius: var(--r-sm);
+  padding: 9px 16px; font-size: 12.5px; font-weight: 600; cursor: pointer; display:flex; align-items:center; gap:6px;
+}
+.btn-primario:hover { background: var(--verde-medio); }
+.btn-secundario {
+  background: var(--branco); color: var(--texto); border: 1px solid var(--borda); border-radius: var(--r-sm);
+  padding: 9px 16px; font-size: 12.5px; font-weight: 600; cursor: pointer; display:flex; align-items:center; gap:6px;
+}
+.btn-secundario:hover { background: var(--cinza-leve); }
+
+/* Formulário de edição de cultura */
+#formCultura { display: none; }
+#formCultura.on { display: block; }
+.fc-secao {
+  border: 1px solid var(--borda); border-radius: var(--r-sm);
+  padding: 14px; margin-bottom: 14px; background: var(--cinza-leve);
+}
+.fc-secao h4 {
+  font-size: 13px; font-weight: 700; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 6px; color: var(--verde-medio);
+}
+.fc-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fc-grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.fc-f label { display:block; font-size: 11px; font-weight: 600; color: var(--texto-sec); margin-bottom: 3px; }
+.fc-f input, .fc-f select, .fc-f textarea {
+  width: 100%; border: 1.5px solid var(--borda); border-radius: 7px;
+  padding: 7px 9px; font-size: 12.5px; font-family: inherit; background: var(--branco);
+}
+.fc-f textarea { resize: vertical; min-height: 50px; }
+
+.tabela-doses { width: 100%; border-collapse: collapse; font-size: 11.5px; margin-top: 4px; }
+.tabela-doses th, .tabela-doses td { border: 1px solid var(--borda); padding: 4px; text-align: center; }
+.tabela-doses th { background: var(--branco); font-weight: 700; color: var(--texto-sec); font-size: 10.5px; }
+.tabela-doses td:first-child { text-align: left; font-weight: 600; background: var(--branco); font-size: 10.5px; padding-left: 7px; }
+.tabela-doses input { width: 100%; border: 1px solid var(--borda); border-radius: 5px; padding: 4px; font-size: 11.5px; text-align: center; }
+
+.lista-dinamica { display: flex; flex-direction: column; gap: 8px; }
+.linha-dinamica { display: flex; gap: 6px; align-items: center; }
+.linha-dinamica input, .linha-dinamica textarea { flex: 1; }
+.linha-dinamica .btn-rm-linha {
+  background: #FDECEA; color: #C0392B; border: none; border-radius: 6px;
+  width: 28px; height: 28px; flex-shrink: 0; cursor: pointer; font-size: 12px;
+}
+.btn-add-linha {
+  background: var(--branco); border: 1.5px dashed var(--borda); border-radius: 7px;
+  padding: 7px; font-size: 11.5px; color: var(--texto-sec); cursor: pointer; margin-top: 6px;
+}
+.btn-add-linha:hover { border-color: var(--verde-medio); color: var(--verde-medio); }
+
+.fc-acoes { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; position: sticky; bottom: 0; background: var(--branco); padding-top: 10px; }
+
 /* ===== RESPONSIVO ===== */
 @media (max-width: 960px) {
   main { grid-template-columns: 1fr; }
@@ -446,10 +596,13 @@ footer a { color: rgba(255,255,255,0.7); }
 
   <div class="titulo-central">
     <h1><i class="fa-solid fa-seedling" style="color:var(--laranja);margin-right:7px;"></i>Recomendação de Adubagem e Calagem</h1>
-    <div class="sub"><i class="fa-solid fa-leaf" style="margin-right:4px;"></i>Cultura da Soja – Manual IDR-Paraná / IAPAR-EMATER</div>
+    <div class="sub"><i class="fa-solid fa-leaf" style="margin-right:4px;"></i>Cultura da <span id="sub-titulo-cultura">Soja</span> – Manual IDR-Paraná / IAPAR-EMATER</div>
   </div>
 
   <div class="usuario">
+    <button type="button" class="btn-culturas" onclick="abrirGerenciarCulturas()" title="Cadastrar e editar culturas">
+      <i class="fa-solid fa-layer-group"></i> Gerenciar Culturas
+    </button>
     <i class="fa-solid fa-circle-user"></i>
     <div>
       <strong style="display:block;font-size:12px;color:var(--texto);">Usuário</strong>
@@ -460,12 +613,76 @@ footer a { color: rgba(255,255,255,0.7); }
 
 <!-- ===== CONTEÚDO PRINCIPAL ===== -->
 <main>
+  <!-- Coluna 1: Dados do Produtor -->
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-hdr-icon"><i class="fa-solid fa-user"></i></div>
+      <h2>1. Dados da Propriedade</h2>
+    </div>
+
+    <div class="fgrid">
+      <div class="f" style="grid-column:1 / -1;">
+        <label>Cultura *</label>
+        <select id="cultura" onchange="onCulturaChange()"></select>
+      </div>
+
+      <div class="f">
+        <label>Nome do produtor *</label>
+        <input type="text" id="produtor" placeholder="Ex: João Silva">
+      </div>
+
+      <div class="f">
+        <label>Data *</label>
+        <input type="date" id="data" placeholder="Ex: 2025-03-15">
+      </div>
+
+      <div class="f">
+        <label>Município *</label>
+        <input type="text" id="municipio" placeholder="Ex: Pato Branco">
+      </div>
+
+      <div class="f">
+        <label>Lote *</label>
+        <input type="text" id="lote" placeholder="Ex: Lote 12">
+      </div>
+
+      <div class="f">
+        <label>Área Total (ha)</label>
+        <input type="number" id="area_total" placeholder="Ex: 50" step="0.1" min="0">
+      </div>
+
+      <div class="f">
+        <label>Talhão *</label>
+        <input type="text" id="talhao" placeholder="Ex: Talhão A">
+      </div>
+
+      <div class="f">
+        <label>Área do Talhão (ha)</label>
+        <input type="number" id="area_talhao" placeholder="Ex: 10,5" step="0.1" min="0">
+      </div>
+
+      <div class="f">
+        <label>Matrícula do lote *</label>
+        <input type="text" id="matricula" placeholder="Ex: 12345/2024">
+      </div>
+
+      <div class="f">
+        <label>Responsável técnico *</label>
+        <input type="text" id="responsavel" placeholder="Ex: Eng. Agr. Daniel">
+      </div>
+
+      <div class="f">
+        <label>Profundidade da amostra de solos (cm) *</label>
+        <input type="number" id="profundidade" placeholder="Ex: 20" step="0.1" min="0">
+      </div>
+    </div>
+  </div>
 
   <!-- COLUNA 1: DADOS DO SOLO -->
   <div class="card">
     <div class="card-hdr">
       <div class="card-hdr-icon"><i class="fa-solid fa-seedling"></i></div>
-      <h2>1. Inserção Manual de Dados da Análise do Solo</h2>
+      <h2>2. Inserção Manual de Dados da Análise do Solo</h2>
     </div>
 
     <div class="fgrid">
@@ -590,7 +807,7 @@ footer a { color: rgba(255,255,255,0.7); }
   <div class="card">
     <div class="card-hdr">
       <div class="card-hdr-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-      <h2>2. Anexar Laudo de Análise de Solo</h2>
+      <h2>3. Anexar Laudo de Análise de Solo</h2>
     </div>
 
     <div class="upload-area" id="uploadArea"
@@ -600,7 +817,7 @@ footer a { color: rgba(255,255,255,0.7); }
       <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png" onchange="onFileChange(event)">
       <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
       <p>Clique ou arraste o arquivo<br>PDF / Imagem</p>
-      <small>Arquivos aceitos: PDF, JPG, PNG (máx. 10 MB)</small>
+      <small>Arquivos aceitos: PDF, JPG, PNG (máx. 10 MB) — os valores são lidos automaticamente</small>
     </div>
 
     <div class="arq-info" id="arqInfo">
@@ -613,6 +830,22 @@ footer a { color: rgba(255,255,255,0.7); }
     <div class="proc-msg" id="procMsg">
       <i class="fa-solid fa-circle-check"></i>
       <span>Documento carregado. Preencha os campos ao lado com os valores do laudo para calcular a recomendação.</span>
+    </div>
+
+    <div class="proc-loading" id="procLoading">
+      <div class="spinner"></div>
+      <span id="procLoadingTexto">Lendo documento...</span>
+    </div>
+
+    <div class="proc-erro" id="procErro">
+      <i class="fa-solid fa-triangle-exclamation" style="margin-top:1px;"></i>
+      <span id="procErroTexto">Não foi possível ler o arquivo automaticamente. Preencha os campos manualmente.</span>
+    </div>
+
+    <div class="extracao-resumo" id="extracaoResumo">
+      <div class="titulo"><i class="fa-solid fa-wand-magic-sparkles" style="margin-right:5px;"></i>Leitura automática do laudo</div>
+      <div id="extracaoResumoConteudo"></div>
+      <div style="margin-top:6px;color:var(--texto-sec);"><strong>Confira os valores preenchidos</strong> nos campos ao lado antes de calcular — a leitura automática pode conter erros, principalmente em documentos escaneados.</div>
     </div>
 
     <!-- Informações das tabelas de referência -->
@@ -657,7 +890,7 @@ footer a { color: rgba(255,255,255,0.7); }
   <div class="card">
     <div class="card-hdr">
       <div class="card-hdr-icon"><i class="fa-solid fa-comment-dots"></i></div>
-      <h2>3. Observações e Comandos Adicionais</h2>
+      <h2>4. Observações e Comandos Adicionais</h2>
     </div>
 
     <div class="f" style="margin-bottom:1rem;">
@@ -751,6 +984,139 @@ footer a { color: rgba(255,255,255,0.7); }
   </div>
 </div>
 
+<!-- ===== MODAL: GERENCIAR CULTURAS ===== -->
+<div class="modal-ov-lg" id="modalCulturas">
+  <div class="modal-lg">
+    <div class="modal-lg-hdr">
+      <h3><i class="fa-solid fa-layer-group"></i> Gerenciar Culturas</h3>
+      <button class="modal-lg-close" onclick="fecharGerenciarCulturas()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-lg-body">
+
+      <!-- LISTA -->
+      <div id="viewListaCulturas">
+        <p style="font-size:12.5px;color:var(--texto-sec);margin-bottom:14px;">
+          Cadastre aqui as culturas que aparecerão no formulário principal, com suas próprias regras de calagem, nitrogênio, fósforo, potássio, micronutrientes e enxofre — sem precisar editar o código do sistema.
+        </p>
+        <div class="barra-topo-culturas">
+          <button class="btn-primario" onclick="novaCultura()"><i class="fa-solid fa-plus"></i> Nova cultura</button>
+          <div class="grupo">
+            <button class="btn-secundario" onclick="exportarCulturas()"><i class="fa-solid fa-file-export"></i> Exportar (JSON)</button>
+            <button class="btn-secundario" onclick="document.getElementById('inputImportarCulturas').click()"><i class="fa-solid fa-file-import"></i> Importar (JSON)</button>
+            <input type="file" id="inputImportarCulturas" accept=".json" style="display:none;" onchange="importarCulturas(event)">
+          </div>
+        </div>
+        <div class="lista-culturas" id="listaCulturas"></div>
+      </div>
+
+      <!-- FORMULÁRIO -->
+      <form id="formCultura" onsubmit="return salvarCultura(event)">
+        <input type="hidden" id="fc-id-original">
+
+        <div class="fc-secao">
+          <h4><i class="fa-solid fa-tag"></i> Dados gerais</h4>
+          <div class="fc-grid2">
+            <div class="fc-f"><label>Nome da cultura *</label><input type="text" id="fc-nome" placeholder="Ex: Milho Safra" required></div>
+            <div class="fc-f"><label>Referência no Manual (opcional)</label><input type="text" id="fc-ref" placeholder="Ex: Cap. 9 – Milho"></div>
+          </div>
+        </div>
+
+        <div class="fc-secao">
+          <h4><i class="fa-solid fa-mountain"></i> Calagem (Método da Saturação por Bases)</h4>
+          <div class="fc-grid2">
+            <div class="fc-f"><label>V₂ – Saturação por bases alvo (%) *</label><input type="number" id="fc-v2" step="1" min="0" max="100" required></div>
+            <div class="fc-f"><label>Aplicar calagem somente se V₁ atual for menor que (%) *</label><input type="number" id="fc-gatilho" step="1" min="0" max="100" required></div>
+          </div>
+        </div>
+
+        <div class="fc-secao">
+          <h4><i class="fa-solid fa-wind"></i> Nitrogênio</h4>
+          <div class="fc-f"><label>Estratégia</label>
+            <select id="fc-n-tipo" onchange="onTipoNChange()">
+              <option value="fbn">Fixação biológica (leguminosas) — sem N mineral</option>
+              <option value="mineral">Adubação nitrogenada mineral</option>
+            </select>
+          </div>
+          <div id="fc-n-mineral-campos" class="fc-grid2" style="margin-top:8px;display:none;">
+            <div class="fc-f"><label>Dose mínima na semeadura (kg/ha)</label><input type="number" id="fc-n-min" step="1" min="0"></div>
+            <div class="fc-f"><label>Dose máxima na semeadura (kg/ha)</label><input type="number" id="fc-n-max" step="1" min="0"></div>
+          </div>
+          <div class="fc-f" style="margin-top:8px;"><label>Texto da recomendação (aparece no laudo)</label>
+            <textarea id="fc-n-texto" placeholder="Ex: Aplicar 30–50 kg/ha de N na semeadura; restante em cobertura entre V4 e V6."></textarea>
+          </div>
+        </div>
+
+        <div class="fc-secao">
+          <h4><i class="fa-solid fa-circle-dot"></i> Fósforo (P₂O₅ kg/ha) — por classe de solo × produtividade esperada</h4>
+          <table class="tabela-doses">
+            <thead><tr><th>Classe de P no solo</th><th>&lt; 3 t/ha</th><th>3–4 t/ha</th><th>4,1–5 t/ha</th><th>&gt; 5 t/ha</th></tr></thead>
+            <tbody id="fc-tabela-p"></tbody>
+          </table>
+          <label style="display:flex;align-items:center;gap:6px;margin-top:10px;font-size:11.5px;font-weight:600;color:var(--texto-sec);">
+            <input type="checkbox" id="fc-p-rotacao" style="width:auto;"> Permitir dispensa de P quando a cultura suceder cereal de inverno bem adubado (trigo/cevada) com P Alto ou superior
+          </label>
+        </div>
+
+        <div class="fc-secao">
+          <h4><i class="fa-solid fa-fire-flame-curved"></i> Potássio (K₂O kg/ha) — por classe de solo × produtividade esperada</h4>
+          <table class="tabela-doses">
+            <thead><tr><th>Classe de K no solo</th><th>&lt; 3 t/ha</th><th>3–4 t/ha</th><th>4,1–5 t/ha</th><th>&gt; 5 t/ha</th></tr></thead>
+            <tbody id="fc-tabela-k"></tbody>
+          </table>
+          <div class="fc-f" style="margin-top:10px;max-width:260px;">
+            <label>Parcelar quando a dose total ultrapassar (kg/ha)</label>
+            <input type="number" id="fc-k-parcelamento" step="1" min="0" placeholder="Ex: 80">
+          </div>
+        </div>
+
+        <div class="fc-secao">
+          <h4><i class="fa-solid fa-vials"></i> Micronutrientes (kg/ha) — dose por classe de solo (Baixo/Médio/Alto)</h4>
+          <table class="tabela-doses">
+            <thead><tr><th>Nutriente</th><th>Baixo</th><th>Médio</th><th>Alto</th><th>Via de aplicação</th></tr></thead>
+            <tbody id="fc-tabela-micro"></tbody>
+          </table>
+          <div class="fc-f" style="margin-top:10px;">
+            <label>Observação adicional sobre Manganês (opcional — ex.: restrição de uso da análise de solo)</label>
+            <textarea id="fc-mn-restricao" placeholder="Ex: usar a análise de solo com restrição; priorizar aplicação foliar quando houver sintoma de deficiência."></textarea>
+          </div>
+        </div>
+
+        <div class="fc-secao">
+          <h4><i class="fa-solid fa-flask"></i> Enxofre (kg/ha) — dose por classe de solo</h4>
+          <table class="tabela-doses">
+            <thead><tr><th>Muito baixo</th><th>Baixo</th><th>Médio</th><th>Alto</th><th>Muito alto</th></tr></thead>
+            <tbody><tr>
+              <td><input type="number" id="fc-s-mb" step="0.1" min="0"></td>
+              <td><input type="number" id="fc-s-b" step="0.1" min="0"></td>
+              <td><input type="number" id="fc-s-m" step="0.1" min="0"></td>
+              <td><input type="number" id="fc-s-a" step="0.1" min="0"></td>
+              <td><input type="number" id="fc-s-ma" step="0.1" min="0"></td>
+            </tr></tbody>
+          </table>
+        </div>
+
+        <div class="fc-secao">
+          <h4><i class="fa-solid fa-seedling"></i> Outros nutrientes de dose fixa (ex.: Cobalto, Molibdênio)</h4>
+          <div class="lista-dinamica" id="fc-outros"></div>
+          <button type="button" class="btn-add-linha" onclick="addLinhaOutroNutriente()"><i class="fa-solid fa-plus"></i> Adicionar nutriente</button>
+        </div>
+
+        <div class="fc-secao">
+          <h4><i class="fa-solid fa-clipboard-list"></i> Observações fixas desta cultura (aparecem no laudo)</h4>
+          <div class="lista-dinamica" id="fc-observacoes"></div>
+          <button type="button" class="btn-add-linha" onclick="addLinhaObservacao()"><i class="fa-solid fa-plus"></i> Adicionar observação</button>
+        </div>
+
+        <div class="fc-acoes">
+          <button type="button" class="btn-secundario" onclick="cancelarEdicaoCultura()">Cancelar</button>
+          <button type="submit" class="btn-primario"><i class="fa-solid fa-check"></i> Salvar cultura</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
 <!-- ===== RODAPÉ ===== -->
 <footer>
   <p>
@@ -770,7 +1136,7 @@ footer a { color: rgba(255,255,255,0.7); }
      ================================================== -->
 <script>
 // ============================================================
-// UPLOAD
+// UPLOAD + LEITURA AUTOMÁTICA DO LAUDO (PDF / JPG / PNG)
 // ============================================================
 let arquivoOk = false;
 
@@ -783,83 +1149,259 @@ function doDrop(e) {
 }
 function onFileChange(e) { if (e.target.files.length) processaArq(e.target.files[0]); }
 
-function processaArq(file) {
+// --- Carregamento preguiçoso das bibliotecas externas (só quando um arquivo é enviado) ---
+function carregarScript(src) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error('Falha ao carregar biblioteca: ' + src));
+    document.head.appendChild(s);
+  });
+}
+async function garantirPdfJs() {
+  if (window.pdfjsLib) return;
+  await carregarScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js');
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js';
+}
+async function garantirTesseract() {
+  if (window.Tesseract) return;
+  await carregarScript('https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/1.0.17/tesseract.min.js');
+}
+
+function setLoading(texto) {
+  document.getElementById('procLoadingTexto').textContent = texto;
+  document.getElementById('procLoading').classList.add('on');
+  document.getElementById('procMsg').classList.remove('on');
+  document.getElementById('procErro').classList.remove('on');
+  document.getElementById('extracaoResumo').classList.remove('on');
+}
+function setErro(texto) {
+  document.getElementById('procErroTexto').textContent = texto;
+  document.getElementById('procErro').classList.add('on');
+  document.getElementById('procLoading').classList.remove('on');
+}
+
+async function processaArq(file) {
   const ok = ['application/pdf','image/jpeg','image/png'].includes(file.type);
   if (!ok) { alert('Formato não suportado. Use PDF, JPG ou PNG.'); return; }
   if (file.size > 10 * 1024 * 1024) { alert('Arquivo muito grande. Máximo: 10 MB.'); return; }
+
   arquivoOk = true;
   document.getElementById('nomeArq').textContent = file.name;
   document.getElementById('arqInfo').classList.add('on');
-  document.getElementById('procMsg').classList.add('on');
+  document.getElementById('arqInfo').querySelector('i.pdf').className =
+    file.type === 'application/pdf' ? 'fa-solid fa-file-pdf pdf' : 'fa-solid fa-file-image pdf';
+
+  try {
+    setLoading('Lendo documento...');
+    let texto = '';
+    if (file.type === 'application/pdf') {
+      texto = await extrairTextoPDF(file);
+    } else {
+      setLoading('Reconhecendo texto na imagem (OCR)... isso pode levar alguns instantes.');
+      texto = await extrairTextoImagem(file);
+    }
+
+    const { preenchidos, naoEncontrados } = preencherCamposComLaudo(texto);
+
+    document.getElementById('procLoading').classList.remove('on');
+    if (preenchidos.length === 0) {
+      setErro('O arquivo foi lido, mas nenhum valor reconhecível foi encontrado no texto. Preencha os campos manualmente.');
+    } else {
+      document.getElementById('procMsg').classList.add('on');
+      const resumo = document.getElementById('extracaoResumoConteudo');
+      resumo.innerHTML =
+        `<span class="ok-tag"><i class="fa-solid fa-check"></i> Preenchidos automaticamente:</span> ${preenchidos.join(', ')}` +
+        (naoEncontrados.length ? `<br><span class="falta-tag"><i class="fa-solid fa-xmark"></i> Não encontrados no documento:</span> ${naoEncontrados.join(', ')}` : '');
+      document.getElementById('extracaoResumo').classList.add('on');
+    }
+  } catch (err) {
+    console.error(err);
+    setErro('Não foi possível processar o arquivo automaticamente (' + err.message + '). Preencha os campos manualmente com os valores do laudo.');
+  }
 }
+
 function remArq() {
   arquivoOk = false;
   document.getElementById('arqInfo').classList.remove('on');
   document.getElementById('procMsg').classList.remove('on');
+  document.getElementById('procLoading').classList.remove('on');
+  document.getElementById('procErro').classList.remove('on');
+  document.getElementById('extracaoResumo').classList.remove('on');
   document.getElementById('fileInput').value = '';
 }
+
+// --- Extração de texto de PDF (camada de texto; se não houver, cai para OCR) ---
+async function extrairTextoPDF(file) {
+  await garantirPdfJs();
+  const buf = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+
+  let texto = '';
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const conteudo = await page.getTextContent();
+    texto += conteudo.items.map(it => it.str).join(' ') + '\n';
+  }
+
+  // PDF sem camada de texto (ex.: laudo escaneado) -> tenta OCR nas páginas
+  if (texto.trim().length < 40) {
+    setLoading('Documento parece ser escaneado. Aplicando OCR nas páginas...');
+    texto = await ocrPaginasPDF(pdf);
+  }
+  return texto;
+}
+
+async function ocrPaginasPDF(pdf) {
+  await garantirTesseract();
+  let texto = '';
+  const maxPaginas = Math.min(pdf.numPages, 6); // limite para não travar o navegador
+  for (let i = 1; i <= maxPaginas; i++) {
+    setLoading(`OCR na página ${i} de ${maxPaginas}...`);
+    const page = await pdf.getPage(i);
+    const viewport = page.getViewport({ scale: 2 });
+    const canvas = document.createElement('canvas');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+    const resultado = await Tesseract.recognize(canvas, { lang: 'por' });
+    texto += (resultado.text || '') + '\n';
+  }
+  return texto;
+}
+
+// --- OCR direto para JPG/PNG ---
+async function extrairTextoImagem(file) {
+  await garantirTesseract();
+  const resultado = await Tesseract.recognize(file, { lang: 'por' });
+  return resultado.text || '';
+}
+
+// --- Interpretação do texto do laudo e preenchimento dos campos do formulário ---
+function numPtBr(str) {
+  if (!str) return NaN;
+  return parseFloat(str.replace(/\./g, '').replace(',', '.'));
+}
+
+function preencherCamposComLaudo(textoBruto) {
+  // Normaliza espaços e remove notações de carga iônica (Al³⁺, Ca2+, H+ ...) que
+  // continham dígitos e atrapalhavam a extração dos valores reais (ex.: "Al3+" não é 3).
+  let texto = textoBruto.replace(/\s+/g, ' ');
+  texto = texto.replace(/([A-Za-zÀ-ÿ]{1,3})[²³⁺⁻+\-]{1,2}(?![A-Za-zÀ-ÿ])/g, '$1');
+
+  const N = '([\\d]{1,4}[.,]\\d{1,3}|[\\d]{1,4})'; // padrão de número pt-BR (com ou sem decimal)
+
+  // Âncoras SEMPRE ancoradas no nome por extenso (ou símbolo entre parênteses logo após o
+  // nome, ex. "Fósforo (P)"). Nunca usa símbolo isolado (ex. "P", "K", "B"), pois colide
+  // facilmente com abreviações de unidade (ex. "mg") e outras palavras do texto.
+  const anc = (nomeCompleto, simbolo) => {
+    const rotulo = simbolo
+      ? `(?:${nomeCompleto}(?:\\s*\\(${simbolo}\\))?|\\(${simbolo}\\))`
+      : `(?:${nomeCompleto})`;
+    return [
+      new RegExp(rotulo + '[\\s\\S]{0,25}?:\\s*' + N, 'i'),        // "Rótulo (unidade): valor"
+      new RegExp(rotulo + '[^\\d\\n]{0,18}' + N, 'i')              // fallback tabular sem dois-pontos
+    ];
+  };
+
+  // faixa plausível [min, max] para descartar leituras absurdas (OCR/erro de âncora)
+  const mapa = [
+    { id: 'ph',        rex: anc('pH\\s*\\(?\\s*CaCl2?\\)?'), faixa: [2.5, 9.5] },
+    { id: 'mo',        rex: anc('Mat[ée]ria\\s+Org[âa]nica', 'M\\.?O\\.?'), faixa: [0, 150] },
+    { id: 'fosforo',   rex: anc('F[óo]sforo', 'P'), faixa: [0, 400] },
+    { id: 'potassio',  rex: anc('Pot[áa]ssio', 'K'), faixa: [0, 3] },
+    { id: 'calcio',    rex: anc('C[áa]lcio', 'Ca'), faixa: [0, 20] },
+    { id: 'magnesio',  rex: anc('Magn[ée]sio', 'Mg'), faixa: [0, 12] },
+    { id: 'aluminio',  rex: anc('Alum[íi]nio', 'Al'), faixa: [0, 10] },
+    { id: 'hal',       rex: anc('H\\s*\\+\\s*Al'), faixa: [0, 25] },
+    { id: 'sodio',     rex: anc('S[óo]dio', 'Na'), faixa: [0, 3] },
+    { id: 'boro',      rex: anc('Boro', 'B'), faixa: [0, 6] },
+    { id: 'cobre',     rex: anc('Cobre', 'Cu'), faixa: [0, 40] },
+    { id: 'manganes',  rex: anc('Mangan[êe]s', 'Mn'), faixa: [0, 400] },
+    { id: 'zinco',     rex: anc('Zinco', 'Zn'), faixa: [0, 50] },
+    { id: 'enxofre',   rex: anc('Enxofre|S-?SO4'), faixa: [0, 40] },
+    { id: 'ferro',     rex: anc('Ferro', 'Fe'), faixa: [0, 600] }
+  ];
+
+  const nomeCampo = {
+    ph:'pH', mo:'M.O.', fosforo:'P', potassio:'K', calcio:'Ca', magnesio:'Mg',
+    aluminio:'Al³⁺', hal:'H+Al', sodio:'Na', boro:'B', cobre:'Cu', manganes:'Mn',
+    zinco:'Zn', enxofre:'S', ferro:'Fe', textura:'Textura (argila)'
+  };
+
+  const preenchidos = [];
+  const naoEncontrados = [];
+
+  mapa.forEach(campo => {
+    let valor = null;
+    for (const r of campo.rex) {
+      const m = texto.match(r);
+      if (m && m[1]) {
+        const v = numPtBr(m[1]);
+        if (!isNaN(v) && v >= campo.faixa[0] && v <= campo.faixa[1]) { valor = v; break; }
+      }
+    }
+    const input = document.getElementById(campo.id);
+    if (valor !== null) {
+      input.value = valor;
+      input.classList.add('campo-auto');
+      setTimeout(() => input.classList.remove('campo-auto'), 4000);
+      preenchidos.push(nomeCampo[campo.id]);
+    } else {
+      naoEncontrados.push(nomeCampo[campo.id]);
+    }
+  });
+
+  // Textura do solo, a partir do teor de argila (aceita % ou g/kg)
+  const mArgila = texto.match(new RegExp('Argila[^\\d\\n]{0,18}' + N, 'i'));
+  if (mArgila) {
+    let argila = numPtBr(mArgila[1]);
+    if (argila <= 100) argila = argila * 10; // veio em % -> converte para g/kg
+    let classe = null;
+    if (argila < 250) classe = 'arenosa';
+    else if (argila <= 400) classe = 'media';
+    else classe = 'argilosa';
+    const sel = document.getElementById('textura');
+    sel.value = classe;
+    sel.classList.add('campo-auto');
+    setTimeout(() => sel.classList.remove('campo-auto'), 4000);
+    preenchidos.push(nomeCampo.textura);
+  } else {
+    naoEncontrados.push(nomeCampo.textura);
+  }
+
+  return { preenchidos, naoEncontrados };
+}
+
 
 function fechaModal() { document.getElementById('modalErro').classList.remove('on'); }
 document.getElementById('modalErro').addEventListener('click', e => { if (e.target === document.getElementById('modalErro')) fechaModal(); });
 
 // ============================================================
-// TABELAS DE CLASSIFICAÇÃO (Manual IDR-Paraná)
+// MOTOR GENÉRICO DE CULTURAS (dados-orientado)
 // ============================================================
-
-/**
- * Tabela 3.3 – Classificação de P (Mehlich-1) por textura
- * Limites: [muito baixo, baixo, médio, alto, muito alto, cond.evitar]
- */
-function classificaP(p, textura) {
-  // Limites superiores de cada faixa (excl.) para arenosa / media / argilosa
-  const faixas = {
-    arenosa:  [6, 10, 19, 36, 71],   // < esses valores = mb, b, m, a, ma; >= 71 = cond.evitar
-    media:    [7, 12, 21, 41, 81],
-    argilosa: [9, 15, 26, 51, 101]
-  };
-  const limites = faixas[textura] || faixas['media'];
-  if (p < limites[0]) return 'muito_baixo';
-  if (p < limites[1]) return 'baixo';
-  if (p < limites[2]) return 'medio';
-  if (p < limites[3]) return 'alto';
-  if (p < limites[4]) return 'muito_alto';
-  return 'cond_evitar';
-}
-
-/**
- * Tabela 3.4 – Classificação de K (cmolc/dm³)
- */
-function classificaK(k) {
-  if (k < 0.08)  return 'muito_baixo';
-  if (k < 0.16)  return 'baixo';
-  if (k < 0.31)  return 'medio';
-  if (k < 0.61)  return 'alto';
-  if (k < 0.90)  return 'muito_alto';
-  return 'cond_evitar';
-}
-
-/**
- * Tabela 3.5 – Micronutrientes (mg/dm³)
- * Retorna { classe, label }
- */
-function classificaMicro(nutriente, valor) {
-  // Limites: [muito_baixo_max, baixo_max, medio_max, alto_max, muito_alto_max]
-  const tab = {
-    B:  [0.15, 0.30, 0.60, 1.20],   // < 0.15 mb, 0.15-0.30 b, 0.31-0.60 m, 0.61-1.20 a, >1.20 ma
-    Cu: [0.10, 0.30, 0.80, 2.00],
-    Mn: [1.00, 5.00, 10.0, 20.0],
-    Zn: [0.20, 0.50, 1.00, 5.00],
-    S:  [3.00, 6.00, 10.0, 20.0],
-    Fe: [5.00, 10.0, 30.0, 60.0]
-  };
-  const lim = tab[nutriente];
-  if (!lim) return { classe: 'nd', label: 'N/D' };
-  if (valor < lim[0]) return { classe: 'muito_baixo', label: 'Muito baixo' };
-  if (valor < lim[1]) return { classe: 'baixo',      label: 'Baixo' };
-  if (valor < lim[2]) return { classe: 'medio',      label: 'Médio' };
-  if (valor < lim[3]) return { classe: 'alto',       label: 'Alto' };
-  return { classe: 'muito_alto', label: 'Muito alto' };
-}
+// Tabelas gerais de classificação do solo (Cap. 3 do Manual) — válidas para
+// TODAS as culturas (são tabelas de química do solo, não de recomendação por
+// cultura). O que muda por cultura são as DOSES e metas de calagem (abaixo).
+const CLASSIFICACAO_SOLO = {
+  fosforo: {
+    // limites superiores (exclusivos) de cada classe [mb, b, m, a, ma] por faixa de argila (Tabela 3.3)
+    arenosa:  [6, 13, 19, 25, 121],   // argila <250 g/kg
+    media:    [4, 9, 13, 19, 91],     // argila 250-400 g/kg
+    argilosa: [3, 7, 10, 13, 61]      // argila >400 g/kg
+  },
+  potassio: [0.06, 0.13, 0.22, 0.46], // Tabela 3.4 (cmolc/dm³) — sem limite definido p/ cond.evitar
+  micronutrientes: {
+    // [mb, b, m, a, toxidez] em mg/dm³ (Tabela 3.5); toxidez=null → sem limite definido
+    B:  [0.10, 0.21, 0.31, 0.61, 2.0],
+    Cu: [0.20, 0.60, 0.90, 3.10, 20],
+    Mn: [5.00, 16.0, 31.0, 101.0, 200],
+    Zn: [0.40, 0.90, 1.30, 10.1, 30],
+    S:  [1.00, 2.10, 3.10, 6.10, null]
+  }
+};
 
 const labelClasse = {
   muito_baixo: 'Muito baixo',
@@ -870,64 +1412,50 @@ const labelClasse = {
   cond_evitar: 'Condição a evitar'
 };
 
-// ============================================================
-// TABELA 9.11 – FÓSFORO PARA SOJA (P₂O₅ kg/ha)
-// Faixas: [<3, 3-4, 4.1-5, >5] → coluna pela produtividade
-// Retorna valor MÉDIO da faixa recomendada, ou -1 se inviável
-// ============================================================
-function recP(classeP, prodCol) {
-  // prodCol: 0=<3t, 1=3-4t, 2=4.1-5t, 3=>5t
-  // Tabela 9.11 (valores médios das faixas para facilitar cálculo)
-  const tab = {
-  //              <3t   3-4t  4.1-5t  >5t
-    muito_baixo: [ 90,  110,  null,   null ],
-    baixo:       [ 70,   90,   110,   null ],
-    medio:       [ 50,   70,    90,    110 ],
-    alto:        [ 30,   50,    70,     90 ],
-    muito_alto:  [  0,   30,    50,     70 ],
-    cond_evitar: [  0,    0,     0,      0 ]
-  };
-  const row = tab[classeP];
-  if (!row) return 0;
-  const v = row[prodCol];
-  return v; // null = inviável
+/** Classificador genérico por faixas: limites = [mb,b,m,a] ou [mb,b,m,a,toxidez] */
+function classificarPorFaixas(valor, limites) {
+  if (valor < limites[0]) return 'muito_baixo';
+  if (valor < limites[1]) return 'baixo';
+  if (valor < limites[2]) return 'medio';
+  if (valor < limites[3]) return 'alto';
+  if (limites[4] !== undefined && limites[4] !== null && valor > limites[4]) return 'cond_evitar';
+  return 'muito_alto';
 }
 
-// ============================================================
-// TABELA 9.12 – POTÁSSIO PARA SOJA (K₂O kg/ha)
-// Mesma estrutura da Tabela 9.11
-// ============================================================
-function recK(classeK, prodCol) {
-  const tab = {
-  //              <3t   3-4t  4.1-5t  >5t
-    muito_baixo: [ 90,  110,  null,   null ],
-    baixo:       [ 70,   90,   110,   null ],
-    medio:       [ 50,   70,    90,    110 ],
-    alto:        [ 30,   50,    70,     90 ],
-    muito_alto:  [  0,   30,    50,     70 ],
-    cond_evitar: [  0,    0,     0,      0 ]
-  };
-  const row = tab[classeK];
+function classificaP(p, textura) {
+  const limites = CLASSIFICACAO_SOLO.fosforo[textura] || CLASSIFICACAO_SOLO.fosforo.media;
+  return classificarPorFaixas(p, limites);
+}
+function classificaK(k) {
+  return classificarPorFaixas(k, CLASSIFICACAO_SOLO.potassio);
+}
+function classificaMicro(nutriente, valor) {
+  const lim = CLASSIFICACAO_SOLO.micronutrientes[nutriente];
+  if (!lim) return { classe: 'nd', label: 'N/D' };
+  const classe = classificarPorFaixas(valor, lim);
+  return { classe, label: labelClasse[classe] };
+}
+
+/** Lookup genérico de dose de P/K numa tabela [classe][coluna de produtividade] */
+function doseTabelaProd(tabela, classe, prodCol) {
+  const row = tabela && tabela[classe];
   if (!row) return 0;
   return row[prodCol];
 }
 
-// ============================================================
-// TABELA 9.13 – MICRONUTRIENTES PARA SOJA (kg/ha)
-// ============================================================
-function recMicro(nutriente, classe) {
-  const tab = {
-  //          mb     b     m     a  ma  ca
-    B:  [    2.0,  1.5,  1.0,   0,  0,  0 ],
-    Cu: [    1.5,  1.0,  0.5,   0,  0,  0 ],
-    Mn: [    8.0,  6.0,  3.0,   0,  0,  0 ],
-    Zn: [    2.5,  2.0,  1.5,   0,0.1,  0 ]
-  };
-  const ordem = ['muito_baixo','baixo','medio','alto','muito_alto','cond_evitar'];
-  const idx = ordem.indexOf(classe);
-  const row = tab[nutriente];
-  if (!row || idx < 0) return 0;
-  return row[idx];
+/** Dose de micronutriente: solos "muito baixo" recebem a mesma dose de "baixo"
+ *  (a maioria dos manuais não define uma linha própria para "muito baixo"). */
+function doseMicroGenerica(doses, classe) {
+  if (!doses) return 0;
+  if (classe === 'muito_baixo' || classe === 'baixo') return doses.baixo || 0;
+  if (classe === 'medio') return doses.medio || 0;
+  return doses.alto || 0; // alto, muito_alto, cond_evitar
+}
+
+/** Dose de enxofre: tabela indexada pelas 5 classes (mb/b/m/a/ma) */
+function doseEnxofreGenerica(doses, classe) {
+  if (!doses) return 0;
+  return doses[classe] || 0;
 }
 
 // ============================================================
@@ -941,9 +1469,69 @@ function colProd(prod) {
 }
 
 // ============================================================
+// REGISTRO DE CULTURAS
+// ============================================================
+// Cada cultura só define o que muda em relação ao solo (calagem, nitrogênio,
+// doses de P/K/micro/S, outros nutrientes de dose fixa e observações fixas).
+// A cultura "soja" é a padrão do sistema (não pode ser excluída), com todos os
+// valores conferidos linha a linha contra o Manual IDR-Paraná / IAPAR-EMATER.
+const CULTURAS_PADRAO = {
+  soja: {
+    id: 'soja', nome: 'Soja', sistema: true, ref: 'Cap. 9 – Soja',
+    nitrogenio: {
+      tipo: 'fbn',
+      texto: 'Não há necessidade de adubação nitrogenada mineral. Inoculação obrigatória: <em>Bradyrhizobium japonicum</em> ou <em>B. elkanii</em> – mínimo de <strong>3,6 × 10⁶ células/semente</strong>. Preferir inoculante turfoso ou líquido de qualidade comprovada.'
+    },
+    calagem: { alvoV: 60, gatilhoV: 50 },
+    fosforo: {
+      doses: {
+        muito_baixo: [90, 110, null, null], baixo: [70, 90, 110, null], medio: [50, 70, 90, 110],
+        alto: [30, 50, 70, 90], muito_alto: [0, 30, 50, 70], cond_evitar: [0, 0, 0, 0]
+      },
+      rotacaoInverno: true
+    },
+    potassio: {
+      doses: {
+        muito_baixo: [90, 110, null, null], baixo: [70, 90, 110, null], medio: [50, 70, 90, 110],
+        alto: [30, 50, 70, 90], muito_alto: [0, 30, 50, 70], cond_evitar: [0, 0, 0, 0]
+      },
+      parcelamentoAcima: 80
+    },
+    micronutrientes: {
+      B:  { doses: { baixo: 1.5, medio: 1.0, alto: 0 }, via: 'Solo (semeadura) ou foliar' },
+      Cu: { doses: { baixo: 1.0, medio: 0.5, alto: 0 }, via: 'Solo (semeadura) ou foliar' },
+      Mn: { doses: { baixo: 6.0, medio: 3.0, alto: 0 }, via: 'Foliar – 2 aplicações (V4 e V8), total 0,5–1 kg/ha de Mn',
+            restricaoTexto: 'O Manual recomenda usar a análise de solo de Mn "com restrição", pois não há calibração confiável para essa interpretação. A recomendação prioritária é aplicar Mn via foliar apenas quando surgirem sintomas visuais de deficiência na lavoura – frequentemente associada à calagem excessiva e pH acima de 6,0.' },
+      Zn: { doses: { baixo: 2.0, medio: 1.5, alto: 0 }, via: 'Solo (semeadura) ou foliar' }
+    },
+    enxofre: {
+      doses: { muito_baixo: 25, baixo: 25, medio: 15, alto: 0, muito_alto: 0 },
+      obsTexto: 'Referência geral (o Manual não traz tabela de dose de S por produtividade para esta cultura): 20–30 kg/ha de S.<br>Fontes: Gesso agrícola (14–17% S) ou Sulfato de amônio (22% S).<br>Aplicar no sulco de semeadura ou a lanço.'
+    },
+    outrosNutrientes: [
+      { nome: 'Cobalto', simbolo: 'Co', dose: '2–3', medida: 'g/ha', via: 'Via semente (tratamento de sementes)' },
+      { nome: 'Molibdênio', simbolo: 'Mo', dose: '12–25', medida: 'g/ha', via: 'Via semente (tratamento de sementes)', alertaPhBaixo: 4.8 }
+    ],
+    observacoes: [
+      'Realizar coinoculação com <em>Azospirillum brasilense</em> (100–200 mL/50 kg sementes) para ganho de produtividade. Evitar contato do inoculante com fungicidas e micronutrientes no tratamento de sementes.'
+    ]
+  }
+};
+
+// Registro em memória (cópia profunda do padrão + o que for cadastrado/importado nesta sessão)
+let CULTURAS = JSON.parse(JSON.stringify(CULTURAS_PADRAO));
+let culturaEmEdicaoId = null; // id original sendo editado (null = nova cultura)
+
+
+// ============================================================
 // GERADOR PRINCIPAL
 // ============================================================
 function gerarRec() {
+  // --- Cultura selecionada ---
+  const culturaId = document.getElementById('cultura').value;
+  const cultura = CULTURAS[culturaId];
+  if (!cultura) { alert('Selecione uma cultura válida.'); return; }
+
   // --- Leitura dos campos ---
   const ph       = parseFloat(document.getElementById('ph').value);
   const fosforo  = parseFloat(document.getElementById('fosforo').value);
@@ -1001,10 +1589,9 @@ function gerarRec() {
   const V1 = T > 0 ? (SB * 100) / T : 0;
 
   // --- CALAGEM (Método da Saturação por Bases) ---
-  // Objetivo para soja: V2 = 60%
-  // NC (t/ha) = (V2 - V1) × T / 100
-  // Corrigir para PRNT 85% (PRNT padrão do manual): NC_corr = NC / (PRNT/100)
-  const V2_soja = 60;
+  // Metas definidas por cultura (cadastradas em "Gerenciar Culturas")
+  const V2_alvo    = cultura.calagem.alvoV;
+  const V1_gatilho = cultura.calagem.gatilhoV;
   const PRNT_padrao = 0.85;
   let NC_bruto = 0;
   let calagemObs = '';
@@ -1021,15 +1608,15 @@ function gerarRec() {
     NC_bruto = 0;
     calagemObs = 'V% > 90 – condição a evitar. Não aplicar calcário.';
     calagemStatus = 'ca';
-  } else if (V1 >= V2_soja) {
+  } else if (V1 >= V1_gatilho) {
     NC_bruto = 0;
-    calagemObs = `V% atual (${V1.toFixed(1)}%) ≥ ${V2_soja}% – calagem não necessária.`;
+    calagemObs = `V% atual (${V1.toFixed(1)}%) ≥ ${V1_gatilho}% – calagem não necessária (alvo V₂=${V2_alvo}% só se aplica quando V% < ${V1_gatilho}%).`;
     calagemStatus = 'ok';
   } else {
-    NC_bruto = ((V2_soja - V1) * T) / 100;
+    NC_bruto = ((V2_alvo - V1) * T) / 100;
     // Ajustar pelo PRNT (PRNT padrão = 85%)
     const NC_prnt = NC_bruto / PRNT_padrao;
-    calagemObs = `NC calculada: (${V2_soja} – ${V1.toFixed(1)}) × ${T.toFixed(2)} / 100 = ${NC_bruto.toFixed(2)} t/ha | Corrigido para PRNT 85%: ${NC_prnt.toFixed(2)} t/ha`;
+    calagemObs = `NC calculada: (${V2_alvo} – ${V1.toFixed(1)}) × ${T.toFixed(2)} / 100 = ${NC_bruto.toFixed(2)} t/ha | Corrigido para PRNT 85%: ${NC_prnt.toFixed(2)} t/ha`;
     NC_bruto = NC_prnt;
 
     if (!isNaN(ph) && ph < 4.5) {
@@ -1051,36 +1638,44 @@ function gerarRec() {
 
   // --- FÓSFORO ---
   const clsP = textura && !isNaN(fosforo) ? classificaP(fosforo, textura) : 'medio';
-  const doseP_val = !isNaN(fosforo) ? recP(clsP, prodCol) : null;
+  const doseP_val = !isNaN(fosforo) ? doseTabelaProd(cultura.fosforo.doses, clsP, prodCol) : null;
   const inviavel_P = doseP_val === null;
 
   // --- POTÁSSIO ---
   const clsK = !isNaN(potassio) ? classificaK(potassio) : 'medio';
-  const doseK_val = !isNaN(potassio) ? recK(clsK, prodCol) : null;
+  const doseK_val = !isNaN(potassio) ? doseTabelaProd(cultura.potassio.doses, clsK, prodCol) : null;
   const inviavel_K = doseK_val === null;
+
+  // Observações finais (declarado aqui para poder receber itens dos blocos abaixo)
+  const obsItens = [];
+
+  // --- ROTAÇÃO COM CEREAL DE INVERNO ADUBADO (trigo/cevada) ---
+  if (cultura.fosforo.rotacaoInverno && cultant === 'trigo' && (clsP === 'alto' || clsP === 'muito_alto')) {
+    obsItens.push(`<strong>Rotação com cereal de inverno adubado:</strong> como a cultura anterior foi trigo/cevada e o P no solo está classificado como "${labelClasse[clsP]}", o Manual permite dispensar a adubação fosfatada desta cultura nesse sistema de rotação (desde que o P se mantenha acima do nível de referência do Manual na camada 0-20 cm). A decisão de dispensar o P fica a critério do profissional de assistência técnica, com base no histórico da área.`);
+  }
 
   // --- MICRONUTRIENTES ---
   const micros = [];
-  if (!isNaN(boro)) {
-    const cls = classificaMicro('B', boro);
-    const dose = recMicro('B', cls.classe);
-    if (dose > 0) micros.push({ nome: 'Boro (B)', unidade: 'B', dose, cls: cls.label, via: 'Solo (semeadura) ou foliar' });
+  function processarMicro(valor, chave, nomeExibicao) {
+    const def = cultura.micronutrientes && cultura.micronutrientes[chave];
+    if (isNaN(valor) || !def) return;
+    const cls = classificaMicro(chave, valor);
+    const dose = doseMicroGenerica(def.doses, cls.classe);
+    if (dose > 0) micros.push({ nome: `${nomeExibicao} (${chave})`, unidade: chave, dose, medida: 'kg/ha', cls: cls.label, via: def.via || 'Solo (semeadura) ou foliar' });
+    if (cls.classe === 'cond_evitar') obsItens.push(`<strong style="color:#C62828;">Atenção – ${nomeExibicao}:</strong> teor de ${chave} (${valor} mg/dm³) está em "Condição a evitar" (risco de toxidez às plantas). Não aplicar adubação com este nutriente.`);
+    if (def.restricaoTexto) obsItens.push(`<strong>Restrição – ${nomeExibicao}:</strong> ${def.restricaoTexto}`);
   }
-  if (!isNaN(cobre)) {
-    const cls = classificaMicro('Cu', cobre);
-    const dose = recMicro('Cu', cls.classe);
-    if (dose > 0) micros.push({ nome: 'Cobre (Cu)', unidade: 'Cu', dose, cls: cls.label, via: 'Solo (semeadura) ou foliar' });
-  }
-  if (!isNaN(manganes)) {
-    const cls = classificaMicro('Mn', manganes);
-    const dose = recMicro('Mn', cls.classe);
-    if (dose > 0) micros.push({ nome: 'Manganês (Mn)', unidade: 'Mn', dose, cls: cls.label, via: 'Foliar – 2 a 3 aplicações' });
-  }
-  if (!isNaN(zinco)) {
-    const cls = classificaMicro('Zn', zinco);
-    const dose = recMicro('Zn', cls.classe);
-    if (dose > 0) micros.push({ nome: 'Zinco (Zn)', unidade: 'Zn', dose, cls: cls.label, via: 'Solo (semeadura) ou foliar' });
-  }
+  processarMicro(boro, 'B', 'Boro');
+  processarMicro(cobre, 'Cu', 'Cobre');
+  processarMicro(manganes, 'Mn', 'Manganês');
+  processarMicro(zinco, 'Zn', 'Zinco');
+
+  // --- OUTROS NUTRIENTES DE DOSE FIXA (ex.: Cobalto, Molibdênio) ---
+  (cultura.outrosNutrientes || []).forEach(n => {
+    let clsTxt = '–';
+    if (n.alertaPhBaixo && !isNaN(ph) && ph < n.alertaPhBaixo) clsTxt = `pH CaCl₂ < ${n.alertaPhBaixo} (maior resposta esperada)`;
+    micros.push({ nome: `${n.nome} (${n.simbolo})`, unidade: n.simbolo, dose: n.dose, medida: n.medida || 'kg/ha', cls: clsTxt, via: n.via || '–' });
+  });
 
   // --- ENXOFRE ---
   let recS = 0;
@@ -1088,11 +1683,7 @@ function gerarRec() {
   if (!isNaN(enxofre)) {
     const cls = classificaMicro('S', enxofre);
     clsS_label = cls.label;
-    if (enxofre < 3.0) {
-      recS = 25; // 20-30 kg/ha S (valor médio)
-    } else if (enxofre < 6.0) {
-      recS = 15; // Baixo – recomendação reduzida
-    }
+    recS = doseEnxofreGenerica(cultura.enxofre.doses, cls.classe);
   }
 
   // ============================================================
@@ -1144,20 +1735,20 @@ function gerarRec() {
   html += `</div>`;
 
   // --- BANNER NPK ---
-  const nStr = '0 (FBN)';
+  const nStr = cultura.nitrogenio.tipo === 'fbn' ? '0 (FBN)' : '–';
   const pStr = inviavel_P ? 'Inviável' : (doseP_val !== null ? doseP_val + ' kg/ha' : '–');
   const kStr = inviavel_K ? 'Inviável' : (doseK_val !== null ? doseK_val + ' kg/ha' : '–');
   const calStr = NC_bruto > 0 ? NC_bruto.toFixed(2) + ' t/ha' : 'Não necessária';
 
   html += `<div class="npk-banner">
-    <div><span class="npk-label">Fórmula resumida – Soja</span></div>
+    <div><span class="npk-label">Fórmula resumida – ${cultura.nome}</span></div>
     <div class="npk-nums">
-      <div class="npk-num"><div class="v">–</div><div class="u">kg/ha N</div></div>
+      <div class="npk-num"><div class="v">${cultura.nitrogenio.tipo === 'fbn' ? '–' : (!isNaN(cultura.nitrogenio.min) ? cultura.nitrogenio.min + '–' + cultura.nitrogenio.max : '–')}</div><div class="u">kg/ha N</div></div>
       <div class="npk-num"><div class="v">${inviavel_P ? '⚠' : (doseP_val !== null ? doseP_val : '–')}</div><div class="u">kg/ha P₂O₅</div></div>
       <div class="npk-num"><div class="v">${inviavel_K ? '⚠' : (doseK_val !== null ? doseK_val : '–')}</div><div class="u">kg/ha K₂O</div></div>
       ${NC_bruto > 0 ? `<div class="npk-num"><div class="v">${NC_bruto.toFixed(2)}</div><div class="u">t/ha Calcário</div></div>` : ''}
     </div>
-    <div class="npk-cult">Soja · ${!isNaN(prod) ? prod + ' t/ha' : '–'}${safra === 'segunda' ? ' · 2ª Safra' : ''}</div>
+    <div class="npk-cult">${cultura.nome} · ${!isNaN(prod) ? prod + ' t/ha' : '–'}${safra === 'segunda' ? ' · 2ª Safra' : ''}</div>
   </div>`;
 
   // --- CARDS DE RECOMENDAÇÃO ---
@@ -1169,7 +1760,7 @@ function gerarRec() {
     <div class="val">${NC_bruto > 0 ? NC_bruto.toFixed(2) + ' t/ha' : '—'}</div>
     <div class="det">
       V% atual: <strong>${V1.toFixed(1)}%</strong> | T: <strong>${T.toFixed(2)} cmolc/dm³</strong><br>
-      Objetivo: V₂ = ${V2_soja}% | SB = ${SB.toFixed(3)} cmolc/dm³<br>
+      Objetivo: V₂ = ${V2_alvo}% | SB = ${SB.toFixed(3)} cmolc/dm³<br>
       ${NC_bruto > 0 ? `PRNT padrão: 85% | Fórmula: NC = (V₂–V₁) × T / 100<br>` : ''}
       <em>${calagemObs}</em>
     </div>
@@ -1178,19 +1769,17 @@ function gerarRec() {
 
   // NITROGÊNIO
   html += `<div class="rec-item ri-n">
-    <h3><i class="fa-solid fa-wind" style="margin-right:4px;"></i>Nitrogênio (Tabela 9.11)</h3>
-    <div class="val" style="font-size:16px;">Fixação Biológica</div>
+    <h3><i class="fa-solid fa-wind" style="margin-right:4px;"></i>Nitrogênio</h3>
+    <div class="val" style="font-size:16px;">${cultura.nitrogenio.tipo === 'fbn' ? 'Fixação Biológica' : (!isNaN(cultura.nitrogenio.min) ? cultura.nitrogenio.min + '–' + cultura.nitrogenio.max + ' kg/ha' : '—')}</div>
     <div class="det">
-      Não há necessidade de adubação nitrogenada mineral para soja.<br>
-      <strong>Inoculação obrigatória:</strong> <em>Bradyrhizobium japonicum</em> ou <em>B. elkanii</em> – mínimo de <strong>3,6 × 10⁶ células/semente</strong>.<br>
-      Preferir inoculante turfoso ou líquido de qualidade comprovada.
-      ${cultant === 'milho' || cultant === 'pastagem' ? '<br><strong>Atenção:</strong> cultura anterior pode ter reduzido população de rizóbios – dupla inoculação recomendada.' : ''}
+      ${cultura.nitrogenio.texto || ''}
+      ${cultura.nitrogenio.tipo === 'fbn' && (cultant === 'milho' || cultant === 'pastagem') ? '<br><strong>Atenção:</strong> cultura anterior pode ter reduzido população de rizóbios – dupla inoculação recomendada.' : ''}
     </div>
   </div>`;
 
   // FÓSFORO
   html += `<div class="rec-item ri-p">
-    <h3><i class="fa-solid fa-circle-dot" style="margin-right:4px;"></i>Fósforo – P₂O₅ (Tabela 9.11)</h3>
+    <h3><i class="fa-solid fa-circle-dot" style="margin-right:4px;"></i>Fósforo – P₂O₅</h3>
     <div class="val">${inviavel_P ? '<span style="color:#C0392B;">Inviável</span>' : (doseP_val !== null ? doseP_val + ' kg/ha' : '–')}</div>
     <div class="det">
       Teor de P: <strong>${!isNaN(fosforo) ? fosforo + ' mg/dm³' : '–'}</strong> | Textura: <strong>${textura || '–'}</strong><br>
@@ -1200,15 +1789,16 @@ function gerarRec() {
   </div>`;
 
   // POTÁSSIO
+  const kParcelamento = cultura.potassio.parcelamentoAcima || 80;
   html += `<div class="rec-item ri-k">
-    <h3><i class="fa-solid fa-fire-flame-curved" style="margin-right:4px;"></i>Potássio – K₂O (Tabela 9.12)</h3>
+    <h3><i class="fa-solid fa-fire-flame-curved" style="margin-right:4px;"></i>Potássio – K₂O</h3>
     <div class="val">${inviavel_K ? '<span style="color:#C0392B;">Inviável</span>' : (doseK_val !== null ? doseK_val + ' kg/ha' : '–')}</div>
     <div class="det">
       Teor de K: <strong>${!isNaN(potassio) ? potassio + ' cmolc/dm³' : '–'}</strong><br>
       Classe (Tab. 3.4): <strong>${labelClasse[clsK]}</strong> | Meta: <strong>${!isNaN(prod) ? prodLabels[prodCol] : '–'}</strong><br>
       ${inviavel_K ? '<em style="color:#C0392B;">Cultivo economicamente inviável nesta faixa de produtividade.</em>'
         : (doseK_val !== null && doseK_val > 0
-          ? `Fonte: Cloreto de potássio (KCl 60%). ${doseK_val > 80 ? '<br><strong style="color:#E65100;">PARCELAMENTO OBRIGATÓRIO:</strong> aplicar parte a lanço antes do plantio (até estádio V₄). Dose na semeadura limitada a 80 kg/ha K₂O para evitar danos à germinação.' : 'Aplicar todo na semeadura.'}`
+          ? `Fonte: Cloreto de potássio (KCl 60%). ${doseK_val > kParcelamento ? `<br><strong style="color:#E65100;">PARCELAMENTO OBRIGATÓRIO:</strong> aplicar parte a lanço antes do plantio. Dose na semeadura limitada a ${kParcelamento} kg/ha K₂O para evitar danos à germinação.` : 'Aplicar todo na semeadura.'}`
           : 'Teor de K suficiente – sem necessidade de adubação potássica.')}
     </div>
   </div>`;
@@ -1220,9 +1810,7 @@ function gerarRec() {
       <div class="val">${recS > 0 ? recS + ' kg/ha S' : '—'}</div>
       <div class="det">
         Teor de S: <strong>${enxofre} mg/dm³</strong> | Classe: <strong>${clsS_label || '–'}</strong><br>
-        ${recS > 0
-          ? `Recomendação: 20–30 kg/ha de S.<br>Fontes: Gesso agrícola (14–17% S) ou Sulfato de amônio (22% S).<br>Aplicar no sulco de semeadura ou a lanço.`
-          : 'Teor de enxofre adequado – sem necessidade de adubação sulfatada.'}
+        ${recS > 0 ? (cultura.enxofre.obsTexto || '') : 'Teor de enxofre adequado – sem necessidade de adubação sulfatada.'}
       </div>
     </div>`;
   }
@@ -1231,18 +1819,18 @@ function gerarRec() {
   if (micros.length > 0) {
     let miHtml = micros.map(m =>
       `<div style="margin-bottom:7px;font-size:12.5px;border-bottom:1px solid rgba(0,0,0,0.06);padding-bottom:5px;">
-        <strong>${m.nome}</strong>: <strong>${m.dose} kg/ha</strong> de ${m.unidade}
+        <strong>${m.nome}</strong>: <strong>${m.dose} ${m.medida || 'kg/ha'}</strong> de ${m.unidade}
         <span style="color:var(--texto-sec);font-size:11px;"> (Classe: ${m.cls} | Via: ${m.via})</span>
       </div>`
     ).join('');
     html += `<div class="rec-item ri-mi ${micros.length > 2 ? 'ri-full' : ''}">
-      <h3><i class="fa-solid fa-vials" style="margin-right:4px;"></i>Micronutrientes (Tabela 9.13)</h3>
+      <h3><i class="fa-solid fa-vials" style="margin-right:4px;"></i>Micronutrientes</h3>
       ${miHtml}
       <div class="det" style="margin-top:4px;">Aplicar na semeadura ou via foliar. Confirmar análise foliar durante o ciclo.</div>
     </div>`;
   } else if ([boro,cobre,manganes,zinco].some(v => !isNaN(v))) {
     html += `<div class="rec-item ri-mi">
-      <h3><i class="fa-solid fa-vials" style="margin-right:4px;"></i>Micronutrientes (Tabela 9.13)</h3>
+      <h3><i class="fa-solid fa-vials" style="margin-right:4px;"></i>Micronutrientes</h3>
       <div class="val" style="font-size:16px;">Sem deficiência</div>
       <div class="det">Teores adequados para os micronutrientes analisados. Monitorar periodicamente.</div>
     </div>`;
@@ -1251,7 +1839,6 @@ function gerarRec() {
   html += `</div>`; // fim rec-grid
 
   // OBSERVAÇÕES FINAIS
-  const obsItens = [];
 
   // Calagem
   if (NC_bruto > 0) {
@@ -1259,13 +1846,13 @@ function gerarRec() {
     obsItens.push(`Caso o solo apresente Al³⁺ > 1,0 cmolc/dm³, complementar com aplicação de calcário no sulco (máx. 500 kg/ha de calcário calcítico).`);
   }
 
-  // Inoculação
-  obsItens.push(`<strong>Inoculação:</strong> Obrigatória com <em>Bradyrhizobium japonicum/elkanii</em> – mínimo 3,6 × 10⁶ células/semente. Evitar contato do inoculante com fungicidas e micronutrientes no tratamento de sementes; inocular por último ou usar inoculante turfoso. Realizar coinoculação com <em>Azospirillum brasilense</em> (100–200 mL/50 kg sementes) para ganho de produtividade.`);
-
   // K alto
-  if (!inviavel_K && doseK_val !== null && doseK_val > 80) {
-    obsItens.push(`<strong>Parcelamento de K₂O:</strong> Dose total ${doseK_val} kg/ha K₂O excede 80 kg/ha. Aplicar no máximo 80 kg/ha no sulco de semeadura; o restante a lanço em pré-semeadura ou até estádio V₄ para evitar toxidez por salinidade na germinação.`);
+  if (!inviavel_K && doseK_val !== null && doseK_val > kParcelamento) {
+    obsItens.push(`<strong>Parcelamento de K₂O:</strong> Dose total ${doseK_val} kg/ha K₂O excede ${kParcelamento} kg/ha. Aplicar no máximo ${kParcelamento} kg/ha no sulco de semeadura; o restante a lanço em pré-semeadura para evitar toxidez por salinidade na germinação.`);
   }
+
+  // Observações fixas cadastradas para a cultura
+  (cultura.observacoes || []).forEach(texto => obsItens.push(texto));
 
   // Sistema de cultivo
   if (sistema === 'pd') {
@@ -1274,7 +1861,7 @@ function gerarRec() {
 
   // Segunda safra
   if (safra === 'segunda') {
-    obsItens.push(`<strong>Segunda safra (soja safrinha):</strong> Ciclo mais curto pode limitar potencial produtivo. Manter nutrição adequada, especialmente N-P-K na semeadura.`);
+    obsItens.push(`<strong>Segunda safra:</strong> Ciclo mais curto pode limitar potencial produtivo. Manter nutrição adequada, especialmente N-P-K na semeadura.`);
   }
 
   // Cultura anterior
@@ -1297,7 +1884,7 @@ function gerarRec() {
     obsItens.push(`<strong>Observação informada:</strong> <em>${obs.substring(0, 200)}${obs.length > 200 ? '...' : ''}</em>`);
   }
 
-  obsItens.push(`<strong>Monitoramento:</strong> Realizar nova análise de solo a cada 2–3 anos, ou após calagem intensa. Análise foliar no estádio R1 (florescimento) para validação das recomendações.`);
+  obsItens.push(`<strong>Monitoramento:</strong> Realizar nova análise de solo a cada 2–3 anos, ou após calagem intensa. Análise foliar durante o ciclo para validação das recomendações.`);
   obsItens.push(`Este laudo é indicativo. A validação técnica deve ser realizada por Engenheiro Agrônomo habilitado, conforme Lei n.º 5.194/1966 e Resolução CFMV/CFQ/CREA.`);
 
   html += `<div class="obs-final">
@@ -1308,10 +1895,10 @@ function gerarRec() {
   // Rodapé do laudo
   html += `<div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--borda);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
     <div style="font-size:11px;color:var(--texto-sec);">
-      <i class="fa-solid fa-calendar" style="margin-right:4px;"></i>Emitido em ${dataAtual} · Sistema IDR-Paraná Soja v1.0
+      <i class="fa-solid fa-calendar" style="margin-right:4px;"></i>Emitido em ${dataAtual} · Sistema IDR-Paraná v1.1
     </div>
     <div style="font-size:10.5px;color:var(--cinza);">
-      Ref.: Manual de Adubagem e Calagem – IDR-Paraná/IAPAR-EMATER · Tab. 3.2–3.5, 9.11–9.13
+      Ref.: Manual de Adubagem e Calagem – IDR-Paraná/IAPAR-EMATER ${cultura.ref ? '· ' + cultura.ref : ''}
     </div>
   </div>`;
 
@@ -1322,6 +1909,384 @@ function gerarRec() {
     document.getElementById('sec-resultado').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 120);
 }
+
+// ============================================================
+// GERENCIAR CULTURAS — seletor no formulário principal
+// ============================================================
+function atualizarSeletorCultura() {
+  const sel = document.getElementById('cultura');
+  const atual = sel.value;
+  const ids = Object.keys(CULTURAS);
+  sel.innerHTML = ids.map(id => `<option value="${id}">${CULTURAS[id].nome}</option>`).join('');
+  // mantém a seleção anterior se ainda existir; senão volta para a primeira (soja)
+  sel.value = ids.includes(atual) ? atual : ids[0];
+  onCulturaChange();
+}
+function onCulturaChange() {
+  const sel = document.getElementById('cultura');
+  const cultura = CULTURAS[sel.value];
+  if (cultura) document.getElementById('sub-titulo-cultura').textContent = cultura.nome;
+}
+
+// ============================================================
+// MODAL GERENCIAR CULTURAS
+// ============================================================
+function abrirGerenciarCulturas() {
+  document.getElementById('modalCulturas').classList.add('on');
+  mostrarListaCulturas();
+}
+function fecharGerenciarCulturas() {
+  document.getElementById('modalCulturas').classList.remove('on');
+  atualizarSeletorCultura(); // reflete no formulário principal qualquer mudança feita
+}
+document.getElementById('modalCulturas').addEventListener('click', e => {
+  if (e.target === document.getElementById('modalCulturas')) fecharGerenciarCulturas();
+});
+
+function mostrarListaCulturas() {
+  document.getElementById('viewListaCulturas').style.display = 'block';
+  document.getElementById('formCultura').classList.remove('on');
+  renderListaCulturas();
+}
+
+function renderListaCulturas() {
+  const cont = document.getElementById('listaCulturas');
+  cont.innerHTML = Object.keys(CULTURAS).map(id => {
+    const c = CULTURAS[id];
+    return `<div class="item-cultura">
+      <span class="nome-cult">${c.nome}</span>
+      <span class="${c.sistema ? 'tag-sistema' : 'tag-custom'}">${c.sistema ? 'Padrão do sistema' : 'Personalizada'}</span>
+      <div class="acoes-cult">
+        <button onclick="editarCultura('${id}')" title="Editar"><i class="fa-solid fa-pen"></i></button>
+        <button onclick="duplicarCultura('${id}')" title="Duplicar"><i class="fa-solid fa-copy"></i></button>
+        ${!c.sistema ? `<button class="btn-excluir" onclick="excluirCultura('${id}')" title="Excluir"><i class="fa-solid fa-trash"></i></button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// --- Linhas dinâmicas: outros nutrientes ---
+function addLinhaOutroNutriente(dados) {
+  dados = dados || {};
+  const div = document.createElement('div');
+  div.className = 'linha-dinamica';
+  div.innerHTML = `
+    <input type="text" placeholder="Nome (ex: Cobalto)" class="on-nome" value="${dados.nome || ''}" style="max-width:120px;">
+    <input type="text" placeholder="Símbolo (ex: Co)" class="on-simbolo" value="${dados.simbolo || ''}" style="max-width:70px;">
+    <input type="text" placeholder="Dose (ex: 2–3)" class="on-dose" value="${dados.dose || ''}" style="max-width:70px;">
+    <input type="text" placeholder="Unidade (ex: g/ha)" class="on-medida" value="${dados.medida || 'kg/ha'}" style="max-width:80px;">
+    <input type="text" placeholder="Via de aplicação" class="on-via" value="${dados.via || ''}">
+    <input type="number" placeholder="Alerta se pH <" class="on-ph" value="${dados.alertaPhBaixo != null ? dados.alertaPhBaixo : ''}" style="max-width:90px;" step="0.1">
+    <button type="button" class="btn-rm-linha" onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>
+  `;
+  document.getElementById('fc-outros').appendChild(div);
+}
+function lerOutrosNutrientes() {
+  return [...document.querySelectorAll('#fc-outros .linha-dinamica')].map(l => {
+    const nome = l.querySelector('.on-nome').value.trim();
+    const simbolo = l.querySelector('.on-simbolo').value.trim();
+    if (!nome || !simbolo) return null;
+    const ph = l.querySelector('.on-ph').value;
+    return {
+      nome, simbolo,
+      dose: l.querySelector('.on-dose').value.trim(),
+      medida: l.querySelector('.on-medida').value.trim() || 'kg/ha',
+      via: l.querySelector('.on-via').value.trim(),
+      alertaPhBaixo: ph !== '' ? parseFloat(ph) : undefined
+    };
+  }).filter(Boolean);
+}
+
+// --- Linhas dinâmicas: observações fixas ---
+function addLinhaObservacao(texto) {
+  const div = document.createElement('div');
+  div.className = 'linha-dinamica';
+  div.innerHTML = `
+    <textarea placeholder="Texto que aparecerá nas Observações Técnicas do laudo" rows="2" class="ob-texto">${texto || ''}</textarea>
+    <button type="button" class="btn-rm-linha" onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>
+  `;
+  document.getElementById('fc-observacoes').appendChild(div);
+}
+function lerObservacoes() {
+  return [...document.querySelectorAll('#fc-observacoes .linha-dinamica .ob-texto')]
+    .map(t => t.value.trim()).filter(Boolean);
+}
+
+// --- Tabelas de doses P / K (6 classes × 4 colunas de produtividade) ---
+const CLASSES_DOSE = ['muito_baixo','baixo','medio','alto','muito_alto','cond_evitar'];
+function gerarLinhasTabelaDoseProd(tbodyId, prefixo, dosesExistentes) {
+  const tbody = document.getElementById(tbodyId);
+  tbody.innerHTML = CLASSES_DOSE.map(cl => {
+    const row = (dosesExistentes && dosesExistentes[cl]) || [null,null,null,null];
+    const cels = [0,1,2,3].map(i => {
+      const v = row[i];
+      return `<td><input type="number" step="1" min="0" class="${prefixo}-${cl}-${i}" value="${v === null || v === undefined ? '' : v}" placeholder="${v===null?'inviável':''}"></td>`;
+    }).join('');
+    return `<tr><td>${labelClasse[cl]}</td>${cels}</tr>`;
+  }).join('');
+}
+function lerTabelaDoseProd(prefixo) {
+  const doses = {};
+  CLASSES_DOSE.forEach(cl => {
+    doses[cl] = [0,1,2,3].map(i => {
+      const el = document.querySelector(`.${prefixo}-${cl}-${i}`);
+      const v = el ? el.value.trim() : '';
+      return v === '' ? null : parseFloat(v);
+    });
+  });
+  return doses;
+}
+
+// --- Tabela de doses de micronutrientes (Baixo/Médio/Alto + via) ---
+const MICROS_ORDEM = ['B','Cu','Mn','Zn'];
+const MICROS_NOME = { B:'Boro', Cu:'Cobre', Mn:'Manganês', Zn:'Zinco' };
+function gerarLinhasTabelaMicro(dadosExistentes) {
+  const tbody = document.getElementById('fc-tabela-micro');
+  tbody.innerHTML = MICROS_ORDEM.map(sym => {
+    const def = (dadosExistentes && dadosExistentes[sym]) || {};
+    const doses = def.doses || {};
+    return `<tr>
+      <td>${MICROS_NOME[sym]} (${sym})</td>
+      <td><input type="number" step="0.1" min="0" class="mi-${sym}-baixo" value="${doses.baixo ?? ''}"></td>
+      <td><input type="number" step="0.1" min="0" class="mi-${sym}-medio" value="${doses.medio ?? ''}"></td>
+      <td><input type="number" step="0.1" min="0" class="mi-${sym}-alto" value="${doses.alto ?? ''}"></td>
+      <td><input type="text" class="mi-${sym}-via" value="${def.via || ''}" placeholder="Ex: Solo (semeadura) ou foliar"></td>
+    </tr>`;
+  }).join('');
+}
+function lerTabelaMicro() {
+  const out = {};
+  MICROS_ORDEM.forEach(sym => {
+    const g = (campo) => { const el = document.querySelector(`.mi-${sym}-${campo}`); const v = el ? el.value.trim() : ''; return v === '' ? 0 : parseFloat(v); };
+    out[sym] = {
+      doses: { baixo: g('baixo'), medio: g('medio'), alto: g('alto') },
+      via: (document.querySelector(`.mi-${sym}-via`) || {}).value?.trim() || 'Solo (semeadura) ou foliar'
+    };
+  });
+  const restricao = document.getElementById('fc-mn-restricao').value.trim();
+  if (restricao) out.Mn.restricaoTexto = restricao;
+  return out;
+}
+
+function onTipoNChange() {
+  const tipo = document.getElementById('fc-n-tipo').value;
+  document.getElementById('fc-n-mineral-campos').style.display = tipo === 'mineral' ? 'grid' : 'none';
+}
+
+// --- Abrir formulário (nova / editar / duplicar) ---
+function novaCultura() {
+  culturaEmEdicaoId = null;
+  document.getElementById('fc-id-original').value = '';
+  document.getElementById('viewListaCulturas').style.display = 'none';
+  const form = document.getElementById('formCultura');
+  form.reset();
+  form.classList.add('on');
+  document.getElementById('fc-nome').value = '';
+  document.getElementById('fc-ref').value = '';
+  document.getElementById('fc-v2').value = 60;
+  document.getElementById('fc-gatilho').value = 50;
+  document.getElementById('fc-n-tipo').value = 'fbn';
+  onTipoNChange();
+  document.getElementById('fc-n-texto').value = '';
+  document.getElementById('fc-p-rotacao').checked = false;
+  document.getElementById('fc-k-parcelamento').value = 80;
+  document.getElementById('fc-mn-restricao').value = '';
+  gerarLinhasTabelaDoseProd('fc-tabela-p', 'p', {});
+  gerarLinhasTabelaDoseProd('fc-tabela-k', 'k', {});
+  gerarLinhasTabelaMicro({});
+  ['fc-s-mb','fc-s-b','fc-s-m','fc-s-a','fc-s-ma'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fc-outros').innerHTML = '';
+  document.getElementById('fc-observacoes').innerHTML = '';
+  document.getElementById('formCultura').scrollIntoView({ block: 'start' });
+}
+
+function preencherFormularioComCultura(c) {
+  document.getElementById('fc-nome').value = c.nome || '';
+  document.getElementById('fc-ref').value = c.ref || '';
+  document.getElementById('fc-v2').value = c.calagem.alvoV;
+  document.getElementById('fc-gatilho').value = c.calagem.gatilhoV;
+  document.getElementById('fc-n-tipo').value = c.nitrogenio.tipo;
+  onTipoNChange();
+  if (c.nitrogenio.min != null) document.getElementById('fc-n-min').value = c.nitrogenio.min;
+  if (c.nitrogenio.max != null) document.getElementById('fc-n-max').value = c.nitrogenio.max;
+  document.getElementById('fc-n-texto').value = c.nitrogenio.texto || '';
+  document.getElementById('fc-p-rotacao').checked = !!c.fosforo.rotacaoInverno;
+  document.getElementById('fc-k-parcelamento').value = c.potassio.parcelamentoAcima || 80;
+  document.getElementById('fc-mn-restricao').value = (c.micronutrientes.Mn && c.micronutrientes.Mn.restricaoTexto) || '';
+  gerarLinhasTabelaDoseProd('fc-tabela-p', 'p', c.fosforo.doses);
+  gerarLinhasTabelaDoseProd('fc-tabela-k', 'k', c.potassio.doses);
+  gerarLinhasTabelaMicro(c.micronutrientes);
+  const sd = c.enxofre.doses || {};
+  document.getElementById('fc-s-mb').value = sd.muito_baixo ?? '';
+  document.getElementById('fc-s-b').value  = sd.baixo ?? '';
+  document.getElementById('fc-s-m').value  = sd.medio ?? '';
+  document.getElementById('fc-s-a').value  = sd.alto ?? '';
+  document.getElementById('fc-s-ma').value = sd.muito_alto ?? '';
+  document.getElementById('fc-outros').innerHTML = '';
+  (c.outrosNutrientes || []).forEach(n => addLinhaOutroNutriente(n));
+  document.getElementById('fc-observacoes').innerHTML = '';
+  (c.observacoes || []).forEach(t => addLinhaObservacao(t));
+}
+
+function editarCultura(id) {
+  culturaEmEdicaoId = id;
+  document.getElementById('fc-id-original').value = id;
+  document.getElementById('viewListaCulturas').style.display = 'none';
+  document.getElementById('formCultura').classList.add('on');
+  preencherFormularioComCultura(CULTURAS[id]);
+  document.getElementById('formCultura').scrollIntoView({ block: 'start' });
+}
+
+function duplicarCultura(id) {
+  culturaEmEdicaoId = null; // duplicar sempre cria uma cultura nova
+  document.getElementById('fc-id-original').value = '';
+  document.getElementById('viewListaCulturas').style.display = 'none';
+  document.getElementById('formCultura').classList.add('on');
+  const copia = JSON.parse(JSON.stringify(CULTURAS[id]));
+  copia.nome = copia.nome + ' (cópia)';
+  copia.sistema = false;
+  preencherFormularioComCultura(copia);
+  document.getElementById('formCultura').scrollIntoView({ block: 'start' });
+}
+
+function excluirCultura(id) {
+  const c = CULTURAS[id];
+  if (!c || c.sistema) return;
+  if (!confirm(`Excluir a cultura "${c.nome}"? Esta ação não pode ser desfeita.`)) return;
+  delete CULTURAS[id];
+  renderListaCulturas();
+}
+
+function cancelarEdicaoCultura() {
+  mostrarListaCulturas();
+}
+
+function gerarIdCultura(nome) {
+  let base = nome.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // remove acentos
+    .replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+  if (!base) base = 'cultura';
+  let id = base, n = 2;
+  while (CULTURAS[id] && id !== culturaEmEdicaoId) { id = base + '_' + n; n++; }
+  return id;
+}
+
+function salvarCultura(e) {
+  e.preventDefault();
+  const nome = document.getElementById('fc-nome').value.trim();
+  if (!nome) return false;
+
+  const tipoN = document.getElementById('fc-n-tipo').value;
+  const nitrogenio = { tipo: tipoN, texto: document.getElementById('fc-n-texto').value.trim() };
+  if (tipoN === 'mineral') {
+    const min = document.getElementById('fc-n-min').value;
+    const max = document.getElementById('fc-n-max').value;
+    if (min !== '') nitrogenio.min = parseFloat(min);
+    if (max !== '') nitrogenio.max = parseFloat(max);
+  }
+
+  const enxofreDoses = {
+    muito_baixo: parseFloat(document.getElementById('fc-s-mb').value) || 0,
+    baixo:       parseFloat(document.getElementById('fc-s-b').value)  || 0,
+    medio:       parseFloat(document.getElementById('fc-s-m').value)  || 0,
+    alto:        parseFloat(document.getElementById('fc-s-a').value)  || 0,
+    muito_alto:  parseFloat(document.getElementById('fc-s-ma').value) || 0
+  };
+
+  const idExistente = document.getElementById('fc-id-original').value;
+  const sistemaFlag = idExistente && CULTURAS[idExistente] ? CULTURAS[idExistente].sistema : false;
+  const id = idExistente || gerarIdCultura(nome);
+
+  const cultura = {
+    id, nome, sistema: sistemaFlag, ref: document.getElementById('fc-ref').value.trim(),
+    nitrogenio,
+    calagem: {
+      alvoV: parseFloat(document.getElementById('fc-v2').value),
+      gatilhoV: parseFloat(document.getElementById('fc-gatilho').value)
+    },
+    fosforo: {
+      doses: lerTabelaDoseProd('p'),
+      rotacaoInverno: document.getElementById('fc-p-rotacao').checked
+    },
+    potassio: {
+      doses: lerTabelaDoseProd('k'),
+      parcelamentoAcima: parseFloat(document.getElementById('fc-k-parcelamento').value) || 80
+    },
+    micronutrientes: lerTabelaMicro(),
+    enxofre: {
+      doses: enxofreDoses,
+      obsTexto: 'Referência geral informada no cadastro desta cultura (o Manual pode não trazer tabela de dose de S por produtividade).<br>Fontes: Gesso agrícola (14–17% S) ou Sulfato de amônio (22% S).<br>Aplicar no sulco de semeadura ou a lanço.'
+    },
+    outrosNutrientes: lerOutrosNutrientes(),
+    observacoes: lerObservacoes()
+  };
+
+  CULTURAS[id] = cultura;
+  culturaEmEdicaoId = null;
+  mostrarListaCulturas();
+  return false;
+}
+
+// --- Exportar / Importar registro completo de culturas (JSON) ---
+function exportarCulturas() {
+  const blob = new Blob([JSON.stringify(CULTURAS, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'culturas_idr-parana.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function importarCulturas(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const dados = JSON.parse(reader.result);
+      if (!dados || typeof dados !== 'object') throw new Error('Formato inválido');
+      // Mescla com o registro atual (não remove a soja nem culturas já cadastradas nesta sessão)
+      Object.keys(dados).forEach(id => {
+        dados[id].id = id;
+        // a cultura "soja" importada nunca sobrescreve a proteção de sistema
+        if (id === 'soja') dados[id].sistema = true;
+        CULTURAS[id] = dados[id];
+      });
+      renderListaCulturas();
+      alert('Culturas importadas com sucesso.');
+    } catch (err) {
+      alert('Não foi possível importar o arquivo: ' + err.message);
+    } finally {
+      e.target.value = '';
+    }
+  };
+  reader.readAsText(file);
+}
+
+// Tenta carregar automaticamente um arquivo "culturas_custom.json" hospedado ao
+// lado deste index.html (útil quando o sistema fica publicado em um servidor).
+// Se não existir ou o arquivo estiver sendo aberto localmente (file://), ignora
+// silenciosamente e mantém apenas as culturas padrão do sistema.
+(function tentarAutoCarregarCulturas() {
+  if (location.protocol === 'file:') return;
+  fetch('./culturas_custom.json').then(r => r.ok ? r.json() : null).then(dados => {
+    if (!dados) return;
+    Object.keys(dados).forEach(id => {
+      dados[id].id = id;
+      if (id === 'soja') dados[id].sistema = true;
+      CULTURAS[id] = dados[id];
+    });
+    atualizarSeletorCultura();
+  }).catch(() => {});
+})();
+
+// Inicializa o seletor de culturas do formulário principal
+atualizarSeletorCultura();
 </script>
+</body>
+</html>
 </body>
 </html>
