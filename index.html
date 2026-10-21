@@ -1190,6 +1190,7 @@ footer a { color: rgba(255,255,255,0.7); }
 // UPLOAD + LEITURA AUTOMÁTICA DO LAUDO (PDF / JPG / PNG)
 // ============================================================
 let arquivoOk = false;
+let avisoOcr = '';
 
 function doDragOver(e) { e.preventDefault(); document.getElementById('uploadArea').classList.add('dragover'); }
 function doDragLeave(e) { document.getElementById('uploadArea').classList.remove('dragover'); }
@@ -1240,6 +1241,7 @@ async function processaArq(file) {
   if (file.size > 10 * 1024 * 1024) { alert('Arquivo muito grande. Máximo: 10 MB.'); return; }
 
   arquivoOk = true;
+  avisoOcr = '';
   document.getElementById('nomeArq').textContent = file.name;
   document.getElementById('arqInfo').classList.add('on');
   document.getElementById('arqInfo').querySelector('i.pdf').className =
@@ -1259,13 +1261,14 @@ async function processaArq(file) {
 
     document.getElementById('procLoading').classList.remove('on');
     if (preenchidos.length === 0) {
-      setErro('O arquivo foi lido, mas nenhum valor reconhecível foi encontrado no texto. Preencha os campos manualmente.');
+      setErro('O arquivo foi lido, mas nenhum valor reconhecível foi encontrado no texto. Preencha os campos manualmente.' + (avisoOcr ? ' ' + avisoOcr : ''));
     } else {
       document.getElementById('procMsg').classList.add('on');
       const resumo = document.getElementById('extracaoResumoConteudo');
       resumo.innerHTML =
         `<span class="ok-tag"><i class="fa-solid fa-check"></i> Preenchidos automaticamente:</span> ${preenchidos.join(', ')}` +
-        (naoEncontrados.length ? `<br><span class="falta-tag"><i class="fa-solid fa-xmark"></i> Não encontrados no documento:</span> ${naoEncontrados.join(', ')}` : '');
+        (naoEncontrados.length ? `<br><span class="falta-tag"><i class="fa-solid fa-xmark"></i> Não encontrados no documento:</span> ${naoEncontrados.join(', ')}` : '') +
+        (avisoOcr ? `<br><strong>Atenção:</strong> ${avisoOcr}` : '');
       document.getElementById('extracaoResumo').classList.add('on');
     }
   } catch (err) {
@@ -1309,6 +1312,7 @@ async function ocrPaginasPDF(pdf) {
   await garantirTesseract();
   let texto = '';
   const maxPaginas = Math.min(pdf.numPages, 6); // limite para não travar o navegador
+  avisoOcr = pdf.numPages > maxPaginas ? `O OCR leu só as ${maxPaginas} primeiras das ${pdf.numPages} páginas do PDF; confira se os dados do laudo estavam nelas.` : '';
   for (let i = 1; i <= maxPaginas; i++) {
     setLoading(`OCR na página ${i} de ${maxPaginas}...`);
     const page = await pdf.getPage(i);
@@ -1333,7 +1337,15 @@ async function extrairTextoImagem(file) {
 // --- Interpretação do texto do laudo e preenchimento dos campos do formulário ---
 function numPtBr(str) {
   if (!str) return NaN;
-  return parseFloat(str.replace(/\./g, '').replace(',', '.'));
+  str = String(str).trim();
+  const temPonto = str.includes('.'), temVirgula = str.includes(',');
+  if (temPonto && temVirgula) {
+    // o último separador é o decimal; o outro é separador de milhar (1.234,5 ou 1,234.5)
+    const dec = str.lastIndexOf(',') > str.lastIndexOf('.') ? ',' : '.';
+    const mil = dec === ',' ? /\./g : /,/g;
+    return parseFloat(str.replace(mil, '').replace(dec, '.'));
+  }
+  return parseFloat(str.replace(',', '.'));   // "5,2" e "5.2" são ambos 5,2
 }
 
 function preencherCamposComLaudo(textoBruto) {
@@ -2022,8 +2034,12 @@ function gerarRec() {
   if (isNaN(hal))       faltando.push('H+Al');
   if (isNaN(prod))      faltando.push('Produtividade esperada');
   if (!textura)         faltando.push('Textura do solo');
+  [['produtor','Nome do produtor'],['data','Data'],['municipio','Município'],['lote','Lote'],
+   ['talhao','Talhão'],['matricula','Matrícula do lote'],['responsavel','Responsável técnico'],
+   ['profundidade','Profundidade da amostra']]
+    .forEach(([id, rot]) => { if (!document.getElementById(id).value.trim()) faltando.push(rot); });
 
-  if (faltando.length > 0 && !arquivoOk) {
+  if (faltando.length > 0) {
     document.getElementById('modalMsg').textContent =
       'Campos obrigatórios não preenchidos: ' + faltando.join(', ') + '.';
     document.getElementById('modalErro').classList.add('on');
@@ -2680,6 +2696,7 @@ function excluirCultura(id) {
   if (!c || c.sistema) return;
   if (!confirm(`Excluir a cultura "${c.nome}"? Esta ação não pode ser desfeita.`)) return;
   delete CULTURAS[id];
+  esquecerCultura(id);
   renderListaCulturas();
 }
 
@@ -2749,6 +2766,7 @@ function salvarCultura(e) {
   };
 
   CULTURAS[id] = cultura;
+  persistirCultura(id);
   culturaEmEdicaoId = null;
   mostrarListaCulturas();
   return false;
@@ -2781,6 +2799,7 @@ function importarCulturas(e) {
         // a cultura "soja" importada nunca sobrescreve a proteção de sistema
         if (id === 'soja') dados[id].sistema = true;
         CULTURAS[id] = dados[id];
+        persistirCultura(id);
       });
       renderListaCulturas();
       alert('Culturas importadas com sucesso.');
@@ -2792,6 +2811,18 @@ function importarCulturas(e) {
   };
   reader.readAsText(file);
 }
+
+// Persistência local: culturas salvas, editadas ou importadas pelo usuário ficam no navegador
+// (localStorage) e voltam ao recarregar a página. Se o armazenamento estiver indisponível, segue só na sessão.
+const LS_CULT = 'idr_culturas_usuario';
+function lsLerCulturas() { try { return JSON.parse(localStorage.getItem(LS_CULT) || '{}') || {}; } catch (e) { return {}; } }
+function lsGravarCulturas(o) { try { localStorage.setItem(LS_CULT, JSON.stringify(o)); } catch (e) { /* indisponível */ } }
+function persistirCultura(id) { const o = lsLerCulturas(); o[id] = CULTURAS[id]; lsGravarCulturas(o); }
+function esquecerCultura(id) { const o = lsLerCulturas(); delete o[id]; lsGravarCulturas(o); }
+(function carregarCulturasLocais() {
+  const o = lsLerCulturas();
+  Object.keys(o).forEach(id => { if (o[id] && o[id].nome) { o[id].id = id; if (id === 'soja') o[id].sistema = true; CULTURAS[id] = o[id]; } });
+})();
 
 // Tenta carregar automaticamente um arquivo "culturas_custom.json" hospedado ao
 // lado deste index.html (útil quando o sistema fica publicado em um servidor).
@@ -2813,7 +2844,5 @@ function importarCulturas(e) {
 // Inicializa o seletor de culturas do formulário principal
 atualizarSeletorCultura();
 </script>
-</body>
-</html>
 </body>
 </html>
